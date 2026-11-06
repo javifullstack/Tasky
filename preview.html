@@ -203,11 +203,18 @@
     }
 
     .brand {
+      display: flex;
+      align-items: center;
+      gap: 7px;
       color: #f5fbff;
       font-size: 22px;
       line-height: 1;
       font-weight: 800;
     }
+
+    .brand-mark { width: 24px; height: 24px; flex: 0 0 auto; }
+    .brand-mark path { fill: #11182a; stroke: var(--yellow); stroke-width: 1.4; stroke-linejoin: round; }
+    .brand-mark .check { fill: none; stroke: var(--magenta); stroke-width: 2.4; stroke-linecap: square; stroke-linejoin: bevel; }
 
     .screen-title {
       color: var(--muted);
@@ -514,7 +521,14 @@
         <div class="bezel" aria-hidden="true"></div>
         <div class="screen" id="screen">
           <header class="topbar">
-            <div class="brand">TASKY</div>
+            <div class="brand">
+              <svg class="brand-mark" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 2.5h11.5L20 7v14.5H4z"/>
+                <path d="M15.5 2.5V7H20"/>
+                <path class="check" d="m7.2 13 3.1 3.1 6.7-7.2"/>
+              </svg>
+              <span>TASKY</span>
+            </div>
             <div class="screen-title">PENDIENTES DE HOY</div>
             <button type="button" class="refresh" id="refresh">REFRESCAR</button>
           </header>
@@ -522,7 +536,7 @@
           <nav class="tabbar" aria-label="Proveedor">
             <button type="button" class="tab todoist active" data-provider="todoist">
               <svg viewBox="0 0 24 24" aria-label="Todoist"><path d="M21 0H3C1.35 0 0 1.35 0 3v3.858s3.854 2.24 4.098 2.38c.31.18.694.177 1.004 0 .26-.147 8.02-4.608 8.136-4.675.279-.161.58-.107.748-.01.164.097.606.348.84.48.232.134.221.502.013.622l-9.712 5.59c-.346.2-.69.204-1.048.002C3.478 10.907.998 9.463 0 8.882v2.02l4.098 2.38c.31.18.694.177 1.004 0 .26-.147 8.02-4.609 8.136-4.676.279-.16.58-.106.748-.008.164.096.606.347.84.48.232.133.221.5.013.62-.208.121-9.288 5.346-9.712 5.59-.346.2-.69.205-1.048.002C3.478 14.951.998 13.506 0 12.926v2.02l4.098 2.38c.31.18.694.177 1.004 0 .26-.147 8.02-4.609 8.136-4.676.279-.16.58-.106.748-.009.164.097.606.348.84.48.232.133.221.502.013.622l-9.712 5.59c-.346.199-.69.204-1.048.001C3.478 18.994.998 17.55 0 16.97V21c0 1.65 1.35 3 3 3h18c1.65 0 3-1.35 3-3V3c0-1.65-1.35-3-3-3z"/></svg>
-              <span>todoist</span>
+              <span>Todoist</span>
             </button>
             <button type="button" class="tab trello" data-provider="trello">
               <svg viewBox="0 0 24 24" aria-label="Trello"><path d="M21.147 0H2.853A2.86 2.86 0 000 2.853v18.294A2.86 2.86 0 002.853 24h18.294A2.86 2.86 0 0024 21.147V2.853A2.86 2.86 0 0021.147 0zM10.34 17.287a.953.953 0 01-.953.953h-4a.954.954 0 01-.954-.953V5.38a.953.953 0 01.954-.953h4a.954.954 0 01.953.953zm9.233-5.467a.944.944 0 01-.953.947h-4a.947.947 0 01-.953-.947V5.38a.953.953 0 01.953-.953h4a.954.954 0 01.953.953z"/></svg>
@@ -643,7 +657,7 @@
         tab.classList.toggle("active", tab.dataset.provider === provider);
       });
 
-      const label = provider === "todoist" ? "TODOIST" : "TRELLO";
+      const label = provider === "todoist" ? "Todoist" : "Trello";
       const message = connection === "empty" ? "SIN CONFIGURAR" :
         connection === "stale" ? "SIN RED · DATOS GUARDADOS" :
         busy ? "ACTUALIZANDO" : "ACTUALIZADO";
