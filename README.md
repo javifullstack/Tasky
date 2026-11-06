@@ -1,6 +1,23 @@
 # Tasky
 
-Panel de consulta para tareas vencidas o con fecha límite de hoy en Todoist y Trello, pensado para la pantalla táctil Freenove ESP32-S3 de 4 pulgadas.
+<table>
+   <tr><td align="center" bgcolor="#080b14"><img src="tasky-logo-white.png" alt="Tasky" width="230"></td></tr>
+</table>
+
+<p align="center"><strong>Tu lista de hoy, en un vistazo.</strong><br>Panel de escritorio para la pantalla táctil Freenove ESP32-S3 de 4 pulgadas.</p>
+
+<p align="center"><a href="preview.html"><strong>Vista previa interactiva</strong></a> · Todoist · Trello · Firmware Arduino</p>
+
+<p align="center"><img src="tasky-dashboard.png" alt="Pantalla principal de Tasky con tareas de Todoist" width="100%"></p>
+
+<table>
+   <tr>
+      <td width="50%" align="center"><img src="tasky-trello.png" alt="Vista de tareas de Trello"><br><sub>Tarjetas de Trello</sub></td>
+      <td width="50%" align="center"><img src="tasky-confirmation.png" alt="Confirmación antes de archivar una tarjeta"><br><sub>Confirmación antes de archivar</sub></td>
+   </tr>
+</table>
+
+Las capturas muestran datos ficticios de la vista previa; no son datos de cuentas reales.
 
 Tasky no crea ni edita tareas. Permite completar tareas de Todoist y archivar tarjetas de Trello. La interfaz pide confirmación antes de cualquiera de estas acciones.
 
