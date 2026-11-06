@@ -19,12 +19,17 @@ constexpr uint8_t kPageSize = 5;
 constexpr int16_t kScreenWidth = 480;
 constexpr int16_t kScreenHeight = 320;
 
-constexpr uint16_t kBackground = 0x0841;
-constexpr uint16_t kSurface = 0x18E3;
-constexpr uint16_t kMuted = 0x9CF3;
-constexpr uint16_t kAccent = 0xFBE0;
-constexpr uint16_t kGood = 0x4E66;
-constexpr uint16_t kBad = 0xF986;
+constexpr uint16_t kBackground = 0x0862;
+constexpr uint16_t kSurface = 0x10C5;
+constexpr uint16_t kPanelActive = 0x1928;
+constexpr uint16_t kPanelBorder = 0x2DAA;
+constexpr uint16_t kMuted = 0x8D38;
+constexpr uint16_t kAccent = 0x271F;
+constexpr uint16_t kMagenta = 0xFA1A;
+constexpr uint16_t kTodoistColor = 0xE226;
+constexpr uint16_t kTrelloColor = 0x033F;
+constexpr uint16_t kGood = 0x6FF6;
+constexpr uint16_t kBad = 0xFA0F;
 
 struct TaskItem {
   String id;
@@ -194,10 +199,34 @@ String shortTime(const String& value) {
 
 void drawButton(int16_t x, int16_t y, int16_t width, int16_t height, const String& label, uint16_t color) {
   display.fillRoundRect(x, y, width, height, 6, color);
-  display.setTextColor(TFT_BLACK, color);
+  uint16_t textColor = (color == kSurface || color == kPanelBorder || color == kTrelloColor) ? TFT_WHITE : kBackground;
+  display.setTextColor(textColor, color);
   display.setTextDatum(MC_DATUM);
   display.drawString(label, x + width / 2, y + height / 2, 2);
   display.setTextDatum(TL_DATUM);
+}
+
+void drawTodoistMark(int16_t x, int16_t y) {
+  display.fillRoundRect(x, y + 2, 18, 4, 2, kTodoistColor);
+  display.fillRoundRect(x + 4, y + 9, 14, 4, 2, kTodoistColor);
+  display.fillRoundRect(x + 8, y + 16, 10, 4, 2, kTodoistColor);
+}
+
+void drawTrelloMark(int16_t x, int16_t y) {
+  display.fillRoundRect(x, y, 22, 22, 4, kTrelloColor);
+  display.fillRoundRect(x + 5, y + 4, 5, 14, 1, TFT_WHITE);
+  display.fillRoundRect(x + 13, y + 4, 5, 9, 1, TFT_WHITE);
+}
+
+void drawSourceButton(int16_t x, int16_t y, bool active, bool todoist) {
+  const uint16_t brandColor = todoist ? kTodoistColor : kTrelloColor;
+  display.fillRoundRect(x, y, 222, 34, 6, active ? kPanelActive : kSurface);
+  display.drawRoundRect(x, y, 222, 34, 6, active ? kAccent : kPanelBorder);
+  if (todoist) drawTodoistMark(x + 67, y + 6);
+  else drawTrelloMark(x + 67, y + 6);
+  display.setTextColor(TFT_WHITE, active ? kPanelActive : kSurface);
+  display.drawString(todoist ? "todoist" : "Trello", x + 96, y + 10, 2);
+  display.drawFastHLine(x + 67, y + 31, 22, brandColor);
 }
 
 void drawScreen() {
@@ -232,8 +261,8 @@ void drawScreen() {
   display.drawString("PENDIENTES DE HOY", 130, 15, 2);
   drawButton(397, 6, 70, 32, loading ? "..." : "REFRESCAR", kAccent);
 
-  drawButton(14, 50, 222, 34, "TODOIST", provider == "todoist" ? kAccent : kSurface);
-  drawButton(244, 50, 222, 34, "TRELLO", provider == "trello" ? kAccent : kSurface);
+  drawSourceButton(14, 50, provider == "todoist", true);
+  drawSourceButton(244, 50, provider == "trello", false);
 
   if (tasks.empty()) {
     display.setTextColor(TFT_WHITE, kBackground);
@@ -243,19 +272,19 @@ void drawScreen() {
   for (size_t index = 0; index < tasks.size() && index < kPageSize; ++index) {
     const int16_t y = 91 + static_cast<int16_t>(index) * 34;
     const bool isSelected = selected == static_cast<int>(index);
-    display.fillRoundRect(12, y, 456, 30, 5, isSelected ? 0x2945 : kSurface);
+    display.fillRoundRect(12, y, 456, 30, 5, isSelected ? kPanelActive : kSurface);
     display.fillRect(12, y + 3, 4, 24, kAccent);
-    display.setTextColor(TFT_WHITE, isSelected ? 0x2945 : kSurface);
+    display.setTextColor(TFT_WHITE, isSelected ? kPanelActive : kSurface);
     display.drawString(clipped(tasks[index].title, 42), 24, y + 1, 2);
-    display.setTextColor(kMuted, isSelected ? 0x2945 : kSurface);
+    display.setTextColor(kMuted, isSelected ? kPanelActive : kSurface);
     display.drawString(clipped(tasks[index].context, 30), 24, y + 17, 1);
-    display.setTextColor(kAccent, isSelected ? 0x2945 : kSurface);
+    display.setTextColor(kAccent, isSelected ? kPanelActive : kSurface);
     display.setTextDatum(TR_DATUM);
     display.drawString(shortTime(tasks[index].due), 459, y + 7, 2);
     display.setTextDatum(TL_DATUM);
   }
 
-  display.drawFastHLine(12, 267, 456, 0x39E7);
+  display.drawFastHLine(12, 267, 456, kPanelBorder);
   String providerLabel = provider == "todoist" ? "TODOIST" : "TRELLO";
   String statusLabel = status == "ok" ? "ACTUALIZADO" :
                        status == "stale" ? "SIN RED · DATOS GUARDADOS" :
@@ -268,8 +297,8 @@ void drawScreen() {
   display.drawString(refreshed.length() >= 16 ? "ACT " + refreshed.substring(11, 16) : "ACT --:--", 466, 273, 1);
   display.setTextDatum(TL_DATUM);
 
-  drawButton(14, 291, 66, 25, "<", page > 0 ? kSurface : 0x1082);
-  drawButton(87, 291, 66, 25, ">", (page + 1) * kPageSize < total ? kSurface : 0x1082);
+  drawButton(14, 291, 66, 25, "<", page > 0 ? kSurface : kPanelBorder);
+  drawButton(87, 291, 66, 25, ">", (page + 1) * kPageSize < total ? kSurface : kPanelBorder);
   String pageText = total == 0 ? "0 tareas" : String(page * kPageSize + 1) + "-" + String(min((page + 1) * kPageSize, total)) + " / " + String(total);
   display.setTextColor(kMuted, kBackground);
   display.setTextDatum(MC_DATUM);
@@ -277,16 +306,16 @@ void drawScreen() {
   display.setTextDatum(TL_DATUM);
 
   if (selected >= 0 && selected < static_cast<int>(tasks.size())) {
-    drawButton(330, 289, 138, 29, provider == "todoist" ? "COMPLETAR" : "ARCHIVAR", provider == "todoist" ? kGood : kBad);
+    drawButton(330, 289, 138, 29, provider == "todoist" ? "COMPLETAR" : "ARCHIVAR", provider == "todoist" ? kGood : kTrelloColor);
   }
 
   if (confirming) {
     display.fillRect(0, 0, kScreenWidth, kScreenHeight, 0x0000);
-    display.drawRoundRect(28, 91, 424, 138, 8, kAccent);
+    display.drawRoundRect(28, 91, 424, 138, 8, kMagenta);
     display.setTextColor(TFT_WHITE, TFT_BLACK);
     display.drawCentreString(provider == "todoist" ? "Completar esta tarea?" : "Archivar esta tarjeta?", 240, 120, 4);
     drawButton(50, 173, 165, 38, "CANCELAR", kSurface);
-    drawButton(265, 173, 165, 38, "CONFIRMAR", provider == "todoist" ? kGood : kBad);
+    drawButton(265, 173, 165, 38, "CONFIRMAR", provider == "todoist" ? kGood : kTrelloColor);
   }
 }
 

@@ -1,0 +1,720 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tasky | Vista previa de placa</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #ecf7ff;
+      --paper: #080b14;
+      --screen: #070a13;
+      --panel: #11182a;
+      --panel-active: #1c2340;
+      --panel-border: #293650;
+      --muted: #91a7c1;
+      --yellow: #29e6ff;
+      --green: #68ffb3;
+      --red: #ff557a;
+      --magenta: #ff3fd6;
+      --todoist: #e44332;
+      --trello: #0065ff;
+      --scale: 1;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        linear-gradient(rgba(41,230,255,.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,63,214,.04) 1px, transparent 1px),
+        repeating-linear-gradient(0deg, transparent 0 31px, rgba(255,63,214,.025) 32px),
+        var(--paper);
+      background-size: 32px 32px, 32px 32px, auto;
+      color: var(--ink);
+      font-family: "Trebuchet MS", "Avenir Next", sans-serif;
+    }
+
+    .page {
+      width: min(1120px, calc(100% - 40px));
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 28px 0 34px;
+      display: grid;
+      grid-template-columns: minmax(230px, 310px) minmax(480px, 1fr);
+      gap: 42px;
+      align-items: center;
+    }
+
+    .intro { align-self: center; }
+
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 20px;
+      color: #83a0be;
+      font: 700 11px/1.2 ui-monospace, "SFMono-Regular", monospace;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 25px;
+      height: 3px;
+      background: var(--yellow);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 34px;
+      line-height: 1;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      max-width: 290px;
+      margin: 15px 0 28px;
+      color: #a7b6cb;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .preview-controls {
+      display: grid;
+      gap: 10px;
+      border-top: 1px solid rgba(41,230,255,.3);
+      padding-top: 18px;
+    }
+
+    .control-label {
+      color: #85a0bd;
+      font: 700 10px/1.2 ui-monospace, "SFMono-Regular", monospace;
+      text-transform: uppercase;
+    }
+
+    .segments {
+      display: flex;
+      padding: 3px;
+      gap: 3px;
+      background: #101629;
+      border-radius: 6px;
+    }
+
+    .segments button {
+      flex: 1;
+      min-height: 36px;
+      padding: 0 8px;
+      border: 0;
+      border-radius: 4px;
+      color: #a5b6cd;
+      background: transparent;
+      font: 700 12px/1 "Trebuchet MS", sans-serif;
+      cursor: pointer;
+    }
+
+    .segments button[aria-pressed="true"] {
+      color: var(--yellow);
+      background: #141d31;
+      box-shadow: inset 0 0 0 1px rgba(41,230,255,.65), 0 0 10px rgba(41,230,255,.16);
+    }
+
+    .hint {
+      margin: 5px 0 0;
+      color: #91a7c1;
+      font-size: 11px;
+      line-height: 1.4;
+    }
+
+    .hardware { min-width: 0; }
+
+    .device-label {
+      display: flex;
+      justify-content: space-between;
+      margin: 0 0 50px;
+      color: #82a2bd;
+      font: 700 10px/1.2 ui-monospace, "SFMono-Regular", monospace;
+      text-transform: uppercase;
+    }
+
+    .scale-stage {
+      position: relative;
+      width: 480px;
+      height: 320px;
+      margin: auto;
+    }
+
+    .bezel {
+      position: absolute;
+      inset: -23px -24px;
+      border: 1px solid rgba(41,230,255,.35);
+      border-radius: 16px;
+      background: linear-gradient(145deg, #1d273b, #090d18 58%, #192037);
+      box-shadow: 0 24px 44px rgba(0,0,0,.58), 0 0 0 1px rgba(41,230,255,.25), 0 0 26px rgba(41,230,255,.14), 0 0 34px rgba(255,63,214,.09);
+    }
+
+    .bezel::before, .bezel::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      width: 4px;
+      height: 4px;
+      transform: translateX(-50%);
+      border-radius: 50%;
+      background: var(--yellow);
+      box-shadow: 0 0 0 2px #141a29, 0 0 8px rgba(41,230,255,.5);
+    }
+
+    .bezel::before { top: 8px; }
+    .bezel::after { bottom: 8px; }
+
+    .screen {
+      position: absolute;
+      inset: 0;
+      width: 480px;
+      height: 320px;
+      overflow: hidden;
+      transform: scale(var(--scale));
+      transform-origin: top left;
+      border: 1px solid #18384b;
+      background: var(--screen);
+      color: #f4f4eb;
+      font-family: Arial, Helvetica, sans-serif;
+      -webkit-font-smoothing: none;
+      user-select: none;
+      touch-action: manipulation;
+    }
+
+    .topbar {
+      position: absolute;
+      inset: 0 0 auto;
+      height: 44px;
+      padding: 0 14px 0 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: var(--panel);
+      box-shadow: inset 0 -1px 0 rgba(41,230,255,.36);
+    }
+
+    .brand {
+      color: #f5fbff;
+      font-size: 22px;
+      line-height: 1;
+      font-weight: 800;
+    }
+
+    .screen-title {
+      color: var(--muted);
+      font: 700 10px/1 ui-monospace, "SFMono-Regular", monospace;
+    }
+
+    .refresh {
+      width: 70px;
+      height: 32px;
+      margin-left: auto;
+      border: 0;
+      border-radius: 5px;
+      color: #07101a;
+      background: var(--yellow);
+      font-size: 9px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .refresh[disabled] { opacity: .7; }
+
+    .tabbar {
+      position: absolute;
+      top: 50px;
+      left: 14px;
+      right: 14px;
+      height: 34px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .tab {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 1px solid var(--panel-border);
+      border-radius: 5px;
+      color: var(--brand-color);
+      background: var(--panel);
+      font: 700 11px/1 Arial, sans-serif;
+      cursor: pointer;
+    }
+
+    .tab svg { width: 18px; height: 18px; flex: 0 0 auto; fill: currentColor; }
+    .tab.todoist { --brand-color: #ff6b5d; }
+    .tab.trello { --brand-color: #5da0ff; }
+
+    .tab.active {
+      border-color: var(--brand-color);
+      background: color-mix(in srgb, var(--brand-color) 13%, #11182a);
+      box-shadow: 0 0 12px color-mix(in srgb, var(--brand-color) 35%, transparent);
+    }
+
+    .task-list {
+      position: absolute;
+      top: 91px;
+      left: 12px;
+      right: 12px;
+      display: grid;
+      gap: 4px;
+    }
+
+    .task-row {
+      position: relative;
+      height: 30px;
+      padding: 2px 48px 1px 12px;
+      overflow: hidden;
+      border: 1px solid transparent;
+      border-radius: 5px;
+      background: var(--panel);
+      cursor: pointer;
+    }
+
+    .task-row::before {
+      content: "";
+      position: absolute;
+      inset: 3px auto 3px 0;
+      width: 3px;
+      background: var(--yellow);
+    }
+
+    .task-row.selected {
+      border-color: var(--magenta);
+      background: var(--panel-active);
+      box-shadow: inset 0 0 0 1px rgba(255,63,214,.35), 0 0 12px rgba(255,63,214,.12);
+    }
+
+    .task-name {
+      display: block;
+      overflow: hidden;
+      color: #f4f8ff;
+      font-size: 12px;
+      line-height: 13px;
+      font-weight: 700;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .task-context {
+      display: block;
+      overflow: hidden;
+      color: var(--muted);
+      font-size: 8px;
+      line-height: 10px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .task-due {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      color: var(--yellow);
+      font: 700 10px/1 ui-monospace, "SFMono-Regular", monospace;
+    }
+
+    .empty-state {
+      position: absolute;
+      top: 151px;
+      left: 20px;
+      right: 20px;
+      color: #e9f5ff;
+      font: 700 11px/1.3 ui-monospace, "SFMono-Regular", monospace;
+      text-align: center;
+    }
+
+    .status-line {
+      position: absolute;
+      top: 267px;
+      left: 12px;
+      right: 12px;
+      height: 1px;
+      background: #29415a;
+    }
+
+    .status-text, .updated {
+      position: absolute;
+      top: 274px;
+      max-width: 295px;
+      overflow: hidden;
+      font: 700 8px/1 ui-monospace, "SFMono-Regular", monospace;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .status-text { left: 14px; color: var(--green); }
+    .status-text.stale { color: var(--yellow); }
+    .status-text.offline { color: var(--red); }
+    .updated { right: 14px; color: var(--muted); }
+
+    .pager {
+      position: absolute;
+      top: 291px;
+      left: 14px;
+      display: flex;
+      gap: 7px;
+    }
+
+    .page-button {
+      width: 66px;
+      height: 25px;
+      border: 1px solid var(--panel-border);
+      border-radius: 4px;
+      color: #c8d7e8;
+      background: var(--panel);
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .page-button:disabled { color: #526880; background: #0c1220; cursor: default; }
+
+    .page-count {
+      position: absolute;
+      top: 301px;
+      left: 177px;
+      width: 122px;
+      color: var(--muted);
+      font: 700 8px/1 ui-monospace, "SFMono-Regular", monospace;
+      text-align: center;
+    }
+
+    .action {
+      position: absolute;
+      top: 289px;
+      right: 12px;
+      width: 138px;
+      height: 29px;
+      border: 0;
+      border-radius: 5px;
+      color: #07101a;
+      background: var(--green);
+      font-size: 10px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .action.archive { color: #f7fbff; background: var(--trello); }
+    .action[hidden] { display: none; }
+
+    .scrim {
+      position: absolute;
+      inset: 0;
+      z-index: 4;
+      display: grid;
+      place-items: center;
+      background: rgba(0,0,0,.72);
+    }
+
+    .scrim[hidden] { display: none; }
+
+    .dialog {
+      width: 424px;
+      height: 138px;
+      padding: 25px 20px 16px;
+      border: 1px solid var(--magenta);
+      border-radius: 8px;
+      background: #0b0e19;
+      box-shadow: 0 0 18px rgba(255,63,214,.16);
+    }
+
+    .dialog-title {
+      min-height: 47px;
+      color: #f4f8ff;
+      font-size: 21px;
+      line-height: 1.15;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .dialog-actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 5px;
+    }
+
+    .dialog-actions button {
+      width: 165px;
+      height: 38px;
+      border: 0;
+      border-radius: 5px;
+      color: #c8d7e8;
+      background: #17233a;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .dialog-actions .confirm { color: #07101a; background: var(--green); }
+    .dialog-actions .confirm.archive { color: #f7fbff; background: var(--trello); }
+
+    .caption {
+      display: flex;
+      justify-content: space-between;
+      margin: 39px 0 0;
+      color: #69776d;
+      font: 700 9px/1.2 ui-monospace, "SFMono-Regular", monospace;
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 760px) {
+      .page {
+        width: min(100% - 28px, 520px);
+        min-height: 100vh;
+        padding: 24px 0 35px;
+        grid-template-columns: 1fr;
+        gap: 24px;
+        align-content: start;
+      }
+
+      .intro { display: grid; grid-template-columns: 1fr; }
+      .eyebrow { margin-bottom: 10px; }
+      h1 { font-size: 28px; }
+      .subtitle { max-width: 460px; margin: 9px 0 14px; }
+      .preview-controls { padding-top: 12px; }
+      .hint { margin-top: 0; }
+      .device-label { margin-bottom: 44px; }
+      .caption { margin-top: 28px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="intro" aria-labelledby="page-title">
+      <div class="eyebrow">Freenove · FNK0104S</div>
+      <h1 id="page-title">Tasky en la placa</h1>
+      <p class="subtitle">Vista de pantalla 480 × 320, con el mismo flujo táctil que el firmware.</p>
+
+      <div class="preview-controls">
+        <div class="control-label">Estado de conexión</div>
+        <div class="segments" role="group" aria-label="Estado simulado">
+          <button type="button" data-state="online" aria-pressed="true">Conectado</button>
+          <button type="button" data-state="stale" aria-pressed="false">Sin red</button>
+          <button type="button" data-state="empty" aria-pressed="false">Vacío</button>
+        </div>
+        <p class="hint">Toca una tarea para seleccionar una acción. La confirmación evita cambios accidentales.</p>
+      </div>
+    </section>
+
+    <section class="hardware" aria-label="Pantalla simulada de la placa">
+      <div class="device-label"><span>DISPLAY PREVIEW</span><span>480 × 320 · LANDSCAPE</span></div>
+      <div class="scale-stage" id="scale-stage">
+        <div class="bezel" aria-hidden="true"></div>
+        <div class="screen" id="screen">
+          <header class="topbar">
+            <div class="brand">TASKY</div>
+            <div class="screen-title">PENDIENTES DE HOY</div>
+            <button type="button" class="refresh" id="refresh">REFRESCAR</button>
+          </header>
+
+          <nav class="tabbar" aria-label="Proveedor">
+            <button type="button" class="tab todoist active" data-provider="todoist">
+              <svg viewBox="0 0 24 24" aria-label="Todoist"><path d="M21 0H3C1.35 0 0 1.35 0 3v3.858s3.854 2.24 4.098 2.38c.31.18.694.177 1.004 0 .26-.147 8.02-4.608 8.136-4.675.279-.161.58-.107.748-.01.164.097.606.348.84.48.232.134.221.502.013.622l-9.712 5.59c-.346.2-.69.204-1.048.002C3.478 10.907.998 9.463 0 8.882v2.02l4.098 2.38c.31.18.694.177 1.004 0 .26-.147 8.02-4.609 8.136-4.676.279-.16.58-.106.748-.008.164.096.606.347.84.48.232.133.221.5.013.62-.208.121-9.288 5.346-9.712 5.59-.346.2-.69.205-1.048.002C3.478 14.951.998 13.506 0 12.926v2.02l4.098 2.38c.31.18.694.177 1.004 0 .26-.147 8.02-4.609 8.136-4.676.279-.16.58-.106.748-.009.164.097.606.348.84.48.232.133.221.502.013.622l-9.712 5.59c-.346.199-.69.204-1.048.001C3.478 18.994.998 17.55 0 16.97V21c0 1.65 1.35 3 3 3h18c1.65 0 3-1.35 3-3V3c0-1.65-1.35-3-3-3z"/></svg>
+              <span>todoist</span>
+            </button>
+            <button type="button" class="tab trello" data-provider="trello">
+              <svg viewBox="0 0 24 24" aria-label="Trello"><path d="M21.147 0H2.853A2.86 2.86 0 000 2.853v18.294A2.86 2.86 0 002.853 24h18.294A2.86 2.86 0 0024 21.147V2.853A2.86 2.86 0 0021.147 0zM10.34 17.287a.953.953 0 01-.953.953h-4a.954.954 0 01-.954-.953V5.38a.953.953 0 01.954-.953h4a.954.954 0 01.953.953zm9.233-5.467a.944.944 0 01-.953.947h-4a.947.947 0 01-.953-.947V5.38a.953.953 0 01.953-.953h4a.954.954 0 01.953.953z"/></svg>
+              <span>Trello</span>
+            </button>
+          </nav>
+
+          <div class="task-list" id="task-list"></div>
+          <div class="empty-state" id="empty-state" hidden>SIN TAREAS VENCIDAS O DE HOY</div>
+          <div class="status-line"></div>
+          <div class="status-text" id="status-text">TODOIST · ACTUALIZADO</div>
+          <div class="updated" id="updated">ACT 09:42</div>
+
+          <div class="pager">
+            <button type="button" class="page-button" id="previous" aria-label="Página anterior">‹</button>
+            <button type="button" class="page-button" id="next" aria-label="Página siguiente">›</button>
+          </div>
+          <div class="page-count" id="page-count">1-5 / 8</div>
+          <button type="button" class="action" id="action" hidden>COMPLETAR</button>
+
+          <div class="scrim" id="scrim" hidden>
+            <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
+              <div class="dialog-title" id="dialog-title">Completar esta tarea?</div>
+              <div class="dialog-actions">
+                <button type="button" id="cancel">CANCELAR</button>
+                <button type="button" class="confirm" id="confirm">CONFIRMAR</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="caption"><span>Wi-Fi 2.4 GHz</span><span id="caption-source">Todoist</span><span id="caption-time">Actualizado 09:42</span></div>
+    </section>
+  </main>
+
+  <script>
+    const sampleData = {
+      todoist: [
+        { title: "Enviar propuesta de arquitectura", context: "Proyecto Boreal", due: "14:30" },
+        { title: "Revisar métricas del trimestre", context: "Marketing", due: "11-06" },
+        { title: "Preparar material para reunión", context: "Equipo", due: "10:15" },
+        { title: "Actualizar entorno de pruebas", context: "Tasky", due: "09:00" },
+        { title: "Responder a Lucía sobre presupuesto", context: "Operaciones", due: "11-05" },
+        { title: "Renovar certificado del dominio", context: "Infraestructura", due: "08:30" },
+        { title: "Revisar propuesta de proveedor", context: "Proyecto Boreal", due: "11-04" },
+        { title: "Confirmar sala de planificación", context: "Equipo", due: "11-06" }
+      ],
+      trello: [
+        { title: "Cerrar revisión de accesibilidad", context: "Tasky · En curso", due: "13:00" },
+        { title: "Actualizar checklist de lanzamiento", context: "Tasky · Próximo", due: "11-06" },
+        { title: "Revisar notas de la versión", context: "Producto · Revisión", due: "11:30" },
+        { title: "Aprobar capturas de la tienda", context: "Producto · En curso", due: "09:45" },
+        { title: "Verificar enlaces del manual", context: "Tasky · Revisión", due: "11-05" },
+        { title: "Preparar etiquetas de publicación", context: "Producto · Próximo", due: "08:00" },
+        { title: "Revisar comentarios pendientes", context: "Tasky · En curso", due: "11-04" }
+      ]
+    };
+
+    const stage = document.getElementById("scale-stage");
+    const screen = document.getElementById("screen");
+    const taskList = document.getElementById("task-list");
+    const emptyState = document.getElementById("empty-state");
+    const actionButton = document.getElementById("action");
+    const scrim = document.getElementById("scrim");
+    const statusText = document.getElementById("status-text");
+    const pageCount = document.getElementById("page-count");
+    const updated = document.getElementById("updated");
+    const PAGE_SIZE = 5;
+
+    let provider = "todoist";
+    let rows = structuredClone(sampleData);
+    let page = 0;
+    let selected = -1;
+    let connection = "online";
+    let busy = false;
+
+    function fitScreen() {
+      const hardwareWidth = document.querySelector(".hardware").clientWidth;
+      const availableWidth = Math.max(240, Math.min(window.innerWidth - 48, hardwareWidth - 48));
+      const availableHeight = Math.max(210, window.innerHeight - 80);
+      const scale = Math.min(1.8, availableWidth / 480, availableHeight / 320);
+      stage.style.width = `${480 * scale}px`;
+      stage.style.height = `${320 * scale}px`;
+      screen.style.setProperty("--scale", scale);
+    }
+
+    function render() {
+      const items = rows[provider];
+      const pageItems = items.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+      taskList.replaceChildren();
+      emptyState.hidden = pageItems.length !== 0;
+
+      pageItems.forEach((item, index) => {
+        const row = document.createElement("button");
+        row.type = "button";
+        row.className = `task-row${selected === index ? " selected" : ""}`;
+        row.setAttribute("aria-pressed", String(selected === index));
+        row.innerHTML = `<span class="task-name"></span><span class="task-context"></span><span class="task-due"></span>`;
+        row.querySelector(".task-name").textContent = item.title;
+        row.querySelector(".task-context").textContent = item.context;
+        row.querySelector(".task-due").textContent = item.due;
+        row.addEventListener("click", () => {
+          selected = selected === index ? -1 : index;
+          render();
+        });
+        taskList.append(row);
+      });
+
+      const start = items.length ? page * PAGE_SIZE + 1 : 0;
+      const end = Math.min((page + 1) * PAGE_SIZE, items.length);
+      pageCount.textContent = items.length ? `${start}-${end} / ${items.length}` : "0 tareas";
+      document.getElementById("previous").disabled = page === 0;
+      document.getElementById("next").disabled = (page + 1) * PAGE_SIZE >= items.length;
+      actionButton.hidden = selected < 0 || !pageItems[selected];
+      actionButton.textContent = provider === "todoist" ? "COMPLETAR" : "ARCHIVAR";
+      actionButton.classList.toggle("archive", provider === "trello");
+      document.querySelectorAll(".tab").forEach(tab => {
+        tab.classList.toggle("active", tab.dataset.provider === provider);
+      });
+
+      const label = provider === "todoist" ? "TODOIST" : "TRELLO";
+      const message = connection === "empty" ? "SIN CONFIGURAR" :
+        connection === "stale" ? "SIN RED · DATOS GUARDADOS" :
+        busy ? "ACTUALIZANDO" : "ACTUALIZADO";
+      statusText.textContent = `${label} · ${message}`;
+      statusText.className = `status-text${connection === "stale" ? " stale" : connection === "empty" ? " offline" : ""}`;
+      updated.textContent = busy ? "ACT ..." : "ACT 09:42";
+      document.getElementById("caption-source").textContent = provider === "todoist" ? "Todoist" : "Trello";
+      document.getElementById("caption-time").textContent = busy ? "Actualizando" : "Actualizado 09:42";
+      document.getElementById("refresh").disabled = busy;
+      document.getElementById("refresh").textContent = busy ? "..." : "REFRESCAR";
+    }
+
+    function simulateRefresh() {
+      if (busy) return;
+      busy = true;
+      render();
+      window.setTimeout(() => {
+        busy = false;
+        render();
+      }, 750);
+    }
+
+    function chooseProvider(nextProvider) {
+      provider = nextProvider;
+      page = 0;
+      selected = -1;
+      render();
+    }
+
+    document.getElementById("refresh").addEventListener("click", simulateRefresh);
+    document.querySelectorAll(".tab").forEach(tab => {
+      tab.addEventListener("click", () => chooseProvider(tab.dataset.provider));
+    });
+    document.getElementById("previous").addEventListener("click", () => {
+      if (page > 0) page--;
+      selected = -1;
+      render();
+    });
+    document.getElementById("next").addEventListener("click", () => {
+      if ((page + 1) * PAGE_SIZE < rows[provider].length) page++;
+      selected = -1;
+      render();
+    });
+    actionButton.addEventListener("click", () => {
+      const item = rows[provider][page * PAGE_SIZE + selected];
+      if (!item) return;
+      document.getElementById("dialog-title").textContent = provider === "todoist" ? "Completar esta tarea?" : "Archivar esta tarjeta?";
+      document.getElementById("confirm").classList.toggle("archive", provider === "trello");
+      scrim.hidden = false;
+    });
+    document.getElementById("cancel").addEventListener("click", () => { scrim.hidden = true; });
+    document.getElementById("confirm").addEventListener("click", () => {
+      rows[provider].splice(page * PAGE_SIZE + selected, 1);
+      if (page > 0 && page * PAGE_SIZE >= rows[provider].length) page--;
+      selected = -1;
+      scrim.hidden = true;
+      render();
+    });
+    document.querySelectorAll("[data-state]").forEach(button => {
+      button.addEventListener("click", () => {
+        connection = button.dataset.state;
+        document.querySelectorAll("[data-state]").forEach(item => {
+          item.setAttribute("aria-pressed", String(item === button));
+        });
+        render();
+      });
+    });
+
+    window.addEventListener("resize", fitScreen);
+    fitScreen();
+    render();
+  </script>
+</body>
+</html>

@@ -4,6 +4,8 @@ Panel de consulta para tareas vencidas o con fecha límite de hoy en Todoist y T
 
 Tasky no crea ni edita tareas. Permite completar tareas de Todoist y archivar tarjetas de Trello. La interfaz pide confirmación antes de cualquiera de estas acciones.
 
+Para ver una simulación interactiva del panel, abre [preview.html](preview.html) en un navegador. Usa una paleta ciberpunk cian/magenta, las marcas Todoist/Trello y datos de ejemplo; no se conecta a tus cuentas ni a la placa.
+
 ## Estado de la primera entrega
 
 - El proyecto no tenía archivos ni instrucciones locales antes de empezar.
@@ -118,3 +120,4 @@ curl -H "Authorization: Bearer $TASKY_DEVICE_TOKEN" \
 - [Trello API: tableros del miembro](https://developer.atlassian.com/cloud/trello/rest/api-group-members/)
 - [Trello API: autenticación y claves](https://developer.atlassian.com/cloud/trello/guides/rest-api/api-introduction/)
 - [Trello API: límites de solicitudes](https://developer.atlassian.com/cloud/trello/guides/rest-api/rate-limits/)
+- [Icono Todoist de Simple Icons](https://github.com/simple-icons/simple-icons/blob/develop/icons/todoist.svg) y [icono Trello](https://github.com/simple-icons/simple-icons/blob/develop/icons/trello.svg); las marcas pertenecen a sus titulares.
