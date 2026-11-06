@@ -4,7 +4,7 @@ Panel de consulta para tareas vencidas o con fecha límite de hoy en Todoist y T
 
 Tasky no crea ni edita tareas. Permite completar tareas de Todoist y archivar tarjetas de Trello. La interfaz pide confirmación antes de cualquiera de estas acciones.
 
-Para ver una simulación interactiva del panel, abre [preview.html](preview.html) en un navegador. Usa Space Grotesk en el wordmark `Task` con la `Y` final superpuesta y menor, una paleta ciberpunk cian/magenta y las marcas Todoist/Trello (con la capitalización `Todoist`); muestra datos de ejemplo y no se conecta a tus cuentas ni a la placa. El sketch usa los GFX FreeFonts `FreeSansBold18pt7b` y `FreeSansBold12pt7b` incluidos con la biblioteca TFT_eSPI de Freenove.
+Para ver una simulación interactiva del panel, abre [preview.html](preview.html) en un navegador. Usa el archivo [tasky-logo-white.png](tasky-logo-white.png) en la maqueta y una máscara monocroma compacta derivada del mismo PNG en el firmware. Conserva la paleta ciberpunk cian/magenta y las marcas Todoist/Trello; muestra datos de ejemplo y no se conecta a tus cuentas ni a la placa.
 
 ## Estado de la primera entrega
 

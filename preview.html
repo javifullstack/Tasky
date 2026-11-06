@@ -206,20 +206,13 @@
     }
 
     .brand {
-      position: relative;
-      white-space: nowrap;
-      color: #f5fbff;
-      font: 700 28px/1 "Space Grotesk", "Avenir Next", "Trebuchet MS", sans-serif;
+      display: flex;
+      align-items: center;
+      width: 100px;
+      height: 36px;
     }
 
-    .brand-y {
-      display: inline-block;
-      margin-left: -2px;
-      font-size: .72em;
-      transform: translateY(-3px);
-      color: var(--magenta);
-      text-shadow: 2px 0 var(--yellow);
-    }
+    .brand-logo { display: block; width: 100px; height: 34px; object-fit: contain; object-position: left center; }
 
     .screen-title {
       color: var(--muted);
@@ -526,7 +519,7 @@
         <div class="bezel" aria-hidden="true"></div>
         <div class="screen" id="screen">
           <header class="topbar">
-            <div class="brand"><span>Task</span><span class="brand-y">Y</span></div>
+            <div class="brand"><img class="brand-logo" src="tasky-logo-white.png" alt="Tasky"></div>
             <div class="screen-title">PENDIENTES DE HOY</div>
             <button type="button" class="refresh" id="refresh">REFRESCAR</button>
           </header>

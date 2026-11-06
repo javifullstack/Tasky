@@ -4,12 +4,11 @@
 #include <FT6336U.h>
 #include <HTTPClient.h>
 #include <TFT_eSPI.h>
-#include <Fonts/GFXFF/FreeSansBold12pt7b.h>
-#include <Fonts/GFXFF/FreeSansBold18pt7b.h>
 #include <WiFi.h>
 #include <vector>
 
 #include "secrets.h"
+#include "tasky_logo_bitmap.h"
 
 namespace {
 
@@ -257,13 +256,8 @@ void drawScreen() {
 
   display.fillScreen(kBackground);
   display.fillRect(0, 0, kScreenWidth, 44, kSurface);
-  display.setFreeFont(&FreeSansBold18pt7b);
   display.setTextColor(TFT_WHITE, kSurface);
-  int16_t taskWidth = display.drawString("Task", 16, 11);
-  display.setFreeFont(&FreeSansBold12pt7b);
-  display.setTextColor(kMagenta, kSurface);
-  display.drawString("Y", 16 + taskWidth - 5, 8);
-  display.setFreeFont(nullptr);
+  display.drawBitmap(16, 7, taskyLogoBitmap, TASKY_LOGO_WIDTH, TASKY_LOGO_HEIGHT, TFT_WHITE);
   display.setTextColor(TFT_WHITE, kSurface);
   display.setTextColor(kMuted, kSurface);
   display.drawString("PENDIENTES DE HOY", 130, 15, 2);
