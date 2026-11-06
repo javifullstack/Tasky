@@ -212,13 +212,6 @@ void drawTodoistMark(int16_t x, int16_t y) {
   display.fillRoundRect(x + 8, y + 16, 10, 4, 2, kTodoistColor);
 }
 
-void drawTaskyMark(int16_t x, int16_t y) {
-  display.drawRoundRect(x, y, 22, 22, 4, kAccent);
-  display.drawLine(x + 15, y + 1, x + 20, y + 6, kAccent);
-  display.drawLine(x + 7, y + 12, x + 10, y + 15, kMagenta);
-  display.drawLine(x + 10, y + 15, x + 17, y + 7, kMagenta);
-}
-
 void drawTrelloMark(int16_t x, int16_t y) {
   display.fillRoundRect(x, y, 22, 22, 4, kTrelloColor);
   display.fillRoundRect(x + 5, y + 4, 5, 14, 1, TFT_WHITE);
@@ -263,8 +256,10 @@ void drawScreen() {
   display.fillScreen(kBackground);
   display.fillRect(0, 0, kScreenWidth, 44, kSurface);
   display.setTextColor(TFT_WHITE, kSurface);
-  drawTaskyMark(16, 10);
-  display.drawString("TASKY", 45, 11, 4);
+  int16_t taskWidth = display.drawString("Task", 16, 11, 4);
+  display.setTextColor(kMagenta, kSurface);
+  display.drawString("Y", 16 + taskWidth - 5, 9, 4);
+  display.setTextColor(TFT_WHITE, kSurface);
   display.setTextColor(kMuted, kSurface);
   display.drawString("PENDIENTES DE HOY", 130, 15, 2);
   drawButton(397, 6, 70, 32, loading ? "..." : "REFRESCAR", kAccent);
